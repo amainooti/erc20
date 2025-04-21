@@ -1,49 +1,50 @@
-# Makefile for Forge (Foundry) commands
+-include .env
 
-# Compile contracts
-build: 
-	@forge build
+.PHONY: all test test-zk clean deploy fund help install snapshot format anvil install deploy deploy-zk deploy-zk-sepolia deploy-sepolia verify
 
-# Run tests
-test:
-	@forge test -vv
+DEFAULT_ANVIL_KEY := 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80
+DEFAULT_ZKSYNC_LOCAL_KEY := 0x7726827caac94a7f9e1b160f7ea819f172f7b6f9d2a97f992c38edeab82d4110
 
-# Run a specific test file
-test-file:
-	@forge test --match-path test/<filename>.t.sol -vv
+all: clean remove install update build
 
-# Deploy contract using a script
+# Clean the repo
+clean  :; forge clean
+
+# Remove modules
+remove :; rm -rf .gitmodules && rm -rf .git/modules/* && rm -rf lib && touch .gitmodules && git add . && git commit -m "modules"
+
+install :; forge install cyfrin/foundry-devops@0.2.2 --no-commit && forge install foundry-rs/forge-std@v1.8.2 --no-commit && forge install openzeppelin/openzeppelin-contracts@v5.0.2 --no-commit
+
+# Update Dependencies
+update:; forge update
+
+build:; forge build
+
+test :; forge test 
+
+test-zk :; foundryup-zksync && forge test --zksync && foundryup
+
+snapshot :; forge snapshot
+
+format :; forge fmt
+
+anvil :; anvil -m 'test test test test test test test test test test test junk' --steps-tracing --block-time 1
+
 deploy:
-@forgeScriptScript/Deploy.s.sol:DeployBroadcastRpcUrl$(RPCURL)PrivateKey$(PRIVATEKEY)
-# Run scripts locally without broadcasting
-run:
-	@forge script script/Deploy.s.sol:Deploy --rpc-url $(RPC_URL)
+	@forge script script/DeployOurToken.s.sol:DeployOurToken --rpc-url http://localhost:8545 --private-key $(DEFAULT_ANVIL_KEY) --broadcast
 
-# Format code using forge-fmt
-fmt:
-	@forge fmt
 
-# Clean artifacts and cache
-clean:
-	@forge clean
+deploy-sepolia:
+	@forge script script/DeployOurToken.s.sol:DeployOurToken --rpc-url $(SEPOLIA_RPC_URL) --account $(ACCOUNT) --sender $(SENDER) --etherscan-api-key $(ETHERSCAN_API_KEY) --broadcast --verify
 
-# Generate gas report
-gas:
-	@forge test --gas-report
+deploy-zk:
+	@forge script script/DeployOurToken.s.sol --rpc-url http://127.0.0.1:8011 --private-key $(DEFAULT_ZKSYNC_LOCAL_KEY) --legacy --zksync
 
-# Set environment variables and run tests
-test-env:
-	@FOUNDRY_PROFILE=ci forge test -vv
+deploy-zk-sepolia:
+	@forge script script/DeployOurToken.s.sol --rpc-url $(ZKSYNC_SEPOLIA_RPC_URL) --account $(ACCOUNT) --legacy --zksync
 
-# Help
-help:
-	@echo "Makefile commands:"
-	@echo "  build       - Compile contracts"
-	@echo "  test        - Run tests"
-	@echo "  test-file   - Run a specific test file"
-	@echo "  deploy      - Deploy contract using a script (set RPC_URL, PRIVATE_KEY)"
-	@echo "  run         - Run deploy script locally"
-	@echo "  fmt         - Format contracts"
-	@echo "  clean       - Remove build artifacts"
-	@echo "  gas         - Run gas report"
-	@echo "  test-env    - Run tests with environment profile"
+deploy-zk-bad:
+	@forge script script/DeployOurToken.s.sol --rpc-url https://sepolia.era.zksync.dev --private-key $(PRIVATE_KEY) --legacy --zksync
+
+verify:
+	@forge verify-contract --chain-id 11155111 --num-of-optimizations 200 --watch --constructor-args 0x00000000000000000000000000000000000000000000d3c21bcecceda1000000 --etherscan-api-key $(ETHERSCAN_API_KEY) --compiler-version v0.8.19+commit.7dd6d404 0x089dc24123e0a27d44282a1ccc2fd815989e3300 src/OurToken.sol:OurToken

@@ -1,0 +1,19 @@
+#### anvil-hardhat
+✅  [Success] Hash: 0xa97d94c435e75c6f80e997d3937d8f30eb6436980b23a2c738483824e79f0597
+Contract Address: 0x5FbDB2315678afecb367f032d93F642f64180aa3
+Block: 48
+Paid: 0.00000177158029504 ETH (941849 gas * 0.00188096 gwei)
+
+✅ Sequence #1 on anvil-hardhat | Total Paid: 0.00000177158029504 ETH (941849 gas * avg 0.00188096 gwei)
+                                                                                                                                                                                                        
+
+==========================
+
+ONCHAIN EXECUTION COMPLETE & SUCCESSFUL.
+
+Transactions saved to: /home/oti-amaino/Documents/development/foundry-erc20-f25/broadcast/DeployOurToken.s.sol/31337/run-latest.json
+
+Sensitive values saved to: /home/oti-amaino/Documents/development/foundry-erc20-f25/cache/DeployOurToken.s.sol/31337/run-latest.json
+
+oti-amaino@oti-amaino-HP-ENVY-x360-Convertible-13-ay0xxx:~/Documents/development/foundry-erc20-f25(main)$ ^C
+oti-amaino@oti-amaino-HP-ENVY-x360-Convertible-13-ay0xxx:~/Documents/development/foundry-erc20-f25(main)$ 
